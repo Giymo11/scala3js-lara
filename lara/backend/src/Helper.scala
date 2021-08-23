@@ -4,8 +4,7 @@ import zhttp.http._
 import zhttp.http.Response.HttpResponse
 import zio.Chunk
 
-object Helper {
-
+object ZhttpHelper {
   def httpDataFromString(s: String): HttpData[Any, Nothing] =
     HttpData.CompleteData(Chunk.fromArray(s.getBytes(HTTP_CHARSET)))
 
@@ -26,4 +25,19 @@ object Helper {
     headers = List(Header.custom("location", location)),
     content = HttpData.empty
   )
+}
+
+object Helper {
+  def openWebPage(location: String): Unit = {
+    import java.awt.Desktop
+    import java.net._
+
+    if(!Desktop.isDesktopSupported()) {
+      println("Desktop not supported")
+    } else {
+      val uri = URL(location).toURI
+      println(s"browsing to $uri")
+      Desktop.getDesktop().browse(uri)
+    }
+  }
 }

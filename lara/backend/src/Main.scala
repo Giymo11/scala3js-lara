@@ -9,6 +9,8 @@ import science.wasabi.lara.backend.Helper
 object Main extends App {
   println("Hello World")
 
+  val port = 8090
+
   object StaticFiles {
     import os.{GlobSyntax, /}
 
@@ -17,14 +19,20 @@ object Main extends App {
     val bundleJs = os.read(os.resource/"out.js")
   }
 
-  val app = Http.collect[Request] {
+  val serverLogic = Http.collect[Request] {
     case Method.GET -> Root / "hello" => Response.text("Hello World!")
-    case Method.GET -> Root => Helper.respondWithHtml(StaticFiles.indexHtml)
-    case Method.GET -> Root / "index.html" => Helper.permanentRedirectTo("/")
-    case Method.GET -> Root / "bundle.js" => Helper.respondWithJs(StaticFiles.bundleJs)
+    case Method.GET -> Root => ZhttpHelper.respondWithHtml(StaticFiles.indexHtml)
+    case Method.GET -> Root / "index.html" => ZhttpHelper.permanentRedirectTo("/")
+    case Method.GET -> Root / "bundle.js" => ZhttpHelper.respondWithJs(StaticFiles.bundleJs)
   }
 
+  val appLogic = for {
+    serverFiber <- Server.start(port, serverLogic).forkDaemon
+    _ <- ZIO(Helper.openWebPage(s"http://localhost:$port"))
+    _ <- serverFiber.join // to block the main thread from finishing
+  } yield ()
+
   override def run(args: List[String]): URIO[zio.ZEnv, ExitCode] =
-    Server.start(8090, app).exitCode
+    appLogic.exitCode
 }
 
