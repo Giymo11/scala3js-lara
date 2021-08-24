@@ -1,11 +1,11 @@
+import $ivy.`com.lihaoyi::mill-contrib-docker:$MILL_VERSION`
+import $ivy.`com.lihaoyi::mill-contrib-bloop:$MILL_VERSION`
 
-import mill._ 
+import mill._
 import mill.scalajslib._
 import scalalib._
-import ammonite.ops._
 import scalafmt._
 
-import $ivy.`com.lihaoyi::mill-contrib-docker:$MILL_VERSION`
 import contrib.docker.DockerModule
 
 object lara extends Module {
@@ -18,6 +18,8 @@ object lara extends Module {
     val osLib = "0.7.8"
     val tapir = "0.19.0-M7"
     val sttpClient3 = "3.3.13"
+    val laminar = "0.13.1"
+    val airstream = "0.13.0"
 
     // has to be this way because sjsdom is not published for scala 3
     val sjsWorkaround = "_sjs1_2.13"
@@ -38,7 +40,8 @@ object lara extends Module {
       ivy"org.scala-js:scalajs-dom$sjsWorkaround:1.1.0",
       ivy"com.softwaremill.sttp.client3::core::$sttpClient3",
       ivy"com.softwaremill.sttp.tapir:tapir-sttp-client$sjsWorkaround:$tapir",
-      ivy"io.github.cquiroz::scala-java-time::2.3.0"
+      ivy"io.github.cquiroz::scala-java-time::2.3.0",
+      ivy"com.raquo::laminar::$laminar"
     )
   }
 
@@ -47,10 +50,10 @@ object lara extends Module {
 
     def ivyDeps = super.ivyDeps() ++ Versions.sharedDeps
 
-    import ammonite.ops._
-    def sources = T.sources {
-      super.sources() :+ PathRef(millSourcePath / up / "shared" / "src")
-    }
+    def sources = T.sources(
+      millSourcePath / "src",
+      millSourcePath / os.up / "shared" / "src"
+    )
   }
 
   object shared extends Common
@@ -67,7 +70,7 @@ object lara extends Module {
     def ivyDeps = super.ivyDeps() ++ Versions.jvmDeps
 
     def resources = T.sources {
-      super.resources() :+ PathRef(frontend.fastOpt().path / up)
+      super.resources() :+ PathRef(frontend.fastOpt().path / os.up)
     }
 
     object docker extends DockerConfig {

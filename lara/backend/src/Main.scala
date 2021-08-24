@@ -4,7 +4,8 @@ import zio._
 import zhttp.http._
 import zhttp.service.Server
 
-import science.wasabi.lara.Config
+import science.wasabi.lara._
+import science.wasabi.lara.backend._
 
 object Main extends App {
   println("Hello World")
@@ -13,7 +14,7 @@ object Main extends App {
 
   val appLogic = for {
     serverFiber <- Server.start(Config.port, serverImpl).forkDaemon
-    _ <- ZIO(OsHelper.openWebPage(Config.location))
+    // _ <- ZIO(OsHelper.openWebPage(Config.apiLocation))
     _ <- serverFiber.join // to block the main thread from finishing
   } yield ()
 

@@ -10,6 +10,7 @@ object StaticFiles {
     val indexHtml = os.read(os.resource / "index.html")
     // this is inserted by the build tool from the "frontend" module
     val bundleJs = os.read(os.resource / "out.js")
+    val bundleJsMap = os.read(os.resource / "out.js.map")
   }
 
 object ZhttpHelper {

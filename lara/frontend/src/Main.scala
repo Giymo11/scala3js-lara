@@ -2,24 +2,46 @@ package science.wasabi.lara.frontend
 
 import org.scalajs.dom
 
-import sttp.client3._
+import sttp.client3.*
 import sttp.tapir.client.sttp.SttpClientInterpreter
+import sttp.model.Uri
+import sttp.capabilities.WebSockets
 
-import science.wasabi.lara._
+import com.raquo.laminar.api.L.{*, given}
+import com.raquo.airstream.eventbus.EventBus
+import com.raquo.airstream.ownership.OneTimeOwner
 
+import science.wasabi.lara.*
+
+import scala.concurrent.Future
 import concurrent.ExecutionContext.Implicits.global
 
-object Main {
-  
-  def main(args: Array[String]): Unit = {
-    println("Hello world!")
+object Main extends App {
 
-    val sttpBackend = FetchBackend()
+  println("Hello world!")
 
-    val client = SttpClientInterpreter().toQuickClient(Endpoints.helloWorldEndpoint, Some(uri"http://localhost:8090"))
+  implicit val sttpBackend: SttpBackend[concurrent.Future, WebSockets] = FetchBackend()
+  implicit val owner: Owner = OneTimeOwner(() => println("accessed after kill"))
 
-    client("Giymo11").onComplete(res => println(res))
-
-    sttpBackend.close()
+  def createHelloWorldClient(location: String) = {
+    val baseUri = Uri.parse(location).right.get
+    println(s"sending request to $baseUri")
+    // quick client has no websocket
+    SttpClientInterpreter().toQuickClientThrowErrors(
+      Endpoints.helloWorldEndpoint,
+      Some(baseUri)
+    )
   }
+
+  val client: String => Future[String] = createHelloWorldClient(Config.apiLocation)
+
+  val eventBus = new EventBus[String]
+  eventBus.events.foreach(x => println(s"Eventbus: $x"))
+
+  val request: Future[String] = client.apply("Giymo11")
+  eventBus.writer.addSource(EventStream.fromFuture(request))
+  
+  eventBus.emit("hello")
+
+  request.foreach(println)
 }
