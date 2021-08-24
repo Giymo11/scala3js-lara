@@ -1,8 +1,16 @@
 package science.wasabi.lara.backend
 
+import zio._
 import zhttp.http._
 import zhttp.http.Response.HttpResponse
-import zio.Chunk
+
+object StaticFiles {
+    import os.{GlobSyntax, /}
+
+    val indexHtml = os.read(os.resource / "index.html")
+    // this is inserted by the build tool from the "frontend" module
+    val bundleJs = os.read(os.resource / "out.js")
+  }
 
 object ZhttpHelper {
   def httpDataFromString(s: String): HttpData[Any, Nothing] =
@@ -27,7 +35,7 @@ object ZhttpHelper {
   )
 }
 
-object Helper {
+object OsHelper {
   def openWebPage(location: String): Unit = {
     import java.awt.Desktop
     import java.net._

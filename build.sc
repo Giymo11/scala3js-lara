@@ -12,10 +12,14 @@ object lara extends Module {
     
     val zio = "1.0.0.0-RC17"
     val osLib = "0.7.8"
+    val tapir = "0.19.0-M7"
 
     val jvmDeps = Agg(
       ivy"io.d11::zhttp:$zio",
-      ivy"com.lihaoyi::os-lib:$osLib"
+      ivy"com.lihaoyi::os-lib:$osLib",
+      ivy"com.softwaremill.sttp.tapir::tapir-core:$tapir",
+      ivy"com.softwaremill.sttp.tapir::tapir-zio-http:$tapir",
+      ivy"com.softwaremill.sttp.tapir::tapir-redoc:$tapir"
     )
 
     val jsDeps = Agg(
