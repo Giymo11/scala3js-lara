@@ -1,16 +1,9 @@
 package science.wasabi.lara.backend
 
 import zio._
-import sttp.tapir._
 import zhttp.http._
 
-object Endpoints {
-  val helloWorldEndpoint = endpoint
-    .in("greet")
-    .in(query[String]("name").description("The name to greet"))
-    .errorOut(stringBody)
-    .out(stringBody)
-}
+import science.wasabi.lara.Endpoints
 
 object Routes {
   import sttp.tapir.server.ziohttp.ZioHttpInterpreter

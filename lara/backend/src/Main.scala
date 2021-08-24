@@ -4,16 +4,16 @@ import zio._
 import zhttp.http._
 import zhttp.service.Server
 
+import science.wasabi.lara.Config
+
 object Main extends App {
   println("Hello World")
-
-  val port = 8090
 
   val serverImpl = Routes.helloWorld <> Routes.staticRoutes <> Routes.notFound
 
   val appLogic = for {
-    serverFiber <- Server.start(port, serverImpl).forkDaemon
-    _ <- ZIO(OsHelper.openWebPage(s"http://localhost:$port"))
+    serverFiber <- Server.start(Config.port, serverImpl).forkDaemon
+    _ <- ZIO(OsHelper.openWebPage(Config.location))
     _ <- serverFiber.join // to block the main thread from finishing
   } yield ()
 
