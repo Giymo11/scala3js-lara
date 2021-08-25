@@ -1,21 +1,21 @@
 package science.wasabi.lara.backend
 
-import zio._
-import zhttp.http._
-import zhttp.http.Response.HttpResponse
-
 object StaticFiles {
-    import os.{GlobSyntax, /}
+  import os.{GlobSyntax, /}
 
-    val indexHtml = os.read(os.resource / "index.html")
-    // this is inserted by the build tool from the "frontend" module
-    val bundleJs = os.read(os.resource / "out.js")
-    val bundleJsMap = os.read(os.resource / "out.js.map")
-  }
+  val indexHtml = os.read(os.resource / "index.html")
+  // this is inserted by the build tool from the "frontend" module
+  val bundleJs = os.read(os.resource / "out.js")
+  val bundleJsMap = os.read(os.resource / "out.js.map")
+}
 
 object ZhttpHelper {
+  import zio.*
+  import zhttp.http.*
+  import zhttp.http.Response.HttpResponse
+
   def httpDataFromString(s: String): HttpData[Any, Nothing] =
-    HttpData.CompleteData(Chunk.fromArray(s.getBytes(HTTP_CHARSET)))
+    HttpData.CompleteData(Chunk.fromArray(s.getBytes(HTTP_CHARSET).nn))
 
   val contentTypeHtml = Header.custom("content-type", "text/html")
   def respondWithHtml(html: String) = Response.http(
@@ -39,14 +39,18 @@ object ZhttpHelper {
 object OsHelper {
   def openWebPage(location: String): Unit = {
     import java.awt.Desktop
-    import java.net._
+    import java.net.*
 
-    if(!Desktop.isDesktopSupported()) {
+    if !Desktop.isDesktopSupported() then {
       println("Desktop not supported")
     } else {
-      val uri = URL(location).toURI
-      println(s"browsing to $uri")
-      Desktop.getDesktop().browse(uri)
+      val desktop = Desktop.getDesktop()
+      if (desktop == null) then println("desktop could not be created")
+      else {
+        val uri = URL(location).toURI
+        println(s"browsing to $uri")
+        desktop.browse(uri)
+      }
     }
   }
 }

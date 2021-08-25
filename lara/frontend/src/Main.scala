@@ -15,22 +15,28 @@ import science.wasabi.lara.*
 
 import scala.concurrent.Future
 import concurrent.ExecutionContext.Implicits.global
+import scala.util.Failure
 
 object Main extends App {
-
   println("Hello world!")
 
   implicit val sttpBackend: SttpBackend[concurrent.Future, WebSockets] = FetchBackend()
   implicit val owner: Owner = OneTimeOwner(() => println("accessed after kill"))
 
-  def createHelloWorldClient(location: String) = {
-    val baseUri = Uri.parse(location).right.get
-    println(s"sending request to $baseUri")
-    // quick client has no websocket
-    SttpClientInterpreter().toQuickClientThrowErrors(
-      Endpoints.helloWorldEndpoint,
-      Some(baseUri)
-    )
+  def createHelloWorldClient(location: String): String => Future[String] = {
+    Uri.parse(location) match {
+      case Right(baseUri) => 
+        println(s"sending request to $baseUri")
+        // quick client has no websocket
+        SttpClientInterpreter().toQuickClientThrowErrors(
+          Endpoints.helloWorldEndpoint,
+          Some(baseUri)
+        )
+      case Left(error) => 
+        (_: String) => 
+          println(s"client could not be created, error: $error")
+          Future.failed(Exception(s"found: $error"))
+    }
   }
 
   val client: String => Future[String] = createHelloWorldClient(Config.apiLocation)
@@ -40,7 +46,7 @@ object Main extends App {
 
   val request: Future[String] = client.apply("Giymo11")
   eventBus.writer.addSource(EventStream.fromFuture(request))
-  
+
   eventBus.emit("hello")
 
   request.foreach(println)

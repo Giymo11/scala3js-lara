@@ -1,6 +1,6 @@
 package science.wasabi.lara
 
-import sttp.tapir._
+import sttp.tapir.*
 
 object Endpoints {
   val helloWorldEndpoint = endpoint

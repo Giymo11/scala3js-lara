@@ -1,7 +1,7 @@
 package science.wasabi.lara.backend
 
-import zio._
-import zhttp.http._
+import zio.*
+import zhttp.http.*
 
 import science.wasabi.lara.Endpoints
 

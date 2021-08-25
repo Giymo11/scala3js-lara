@@ -54,6 +54,22 @@ object lara extends Module {
       millSourcePath / "src",
       millSourcePath / os.up / "shared" / "src"
     )
+
+    def scalacOptions = Seq(
+      "-deprecation", // Emit warning and location for usages of deprecated APIs.
+      "-encoding", "utf-8",   // Specify character encoding used by source files.
+      "-explain-types", // Explain type errors in more detail.
+      "-unchecked",  // Enable additional warnings where generated code depends on assumptions.
+      "-feature", // Emit warning and location for usages of features that should be imported explicitly.
+      "-language:implicitConversions",  // Allow definition of implicit functions called views
+      // "-Ykind-projector",
+      
+      "-rewrite", "-new-syntax",  // use new syntax for control structures
+      "-source", "future", // restricts to scala 3.1 featureset
+
+      "-Xfatal-warnings", // Fail the compilation if there are any warnings.
+      "-Yexplicit-nulls", // experimental, forces you to think about every null
+    )
   }
 
   object shared extends Common

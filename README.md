@@ -1,11 +1,7 @@
 
-If you get something like 
-```
-java.io.IOException: GetOverlappedResult() failed for read operation: 233
-```
-it may have to do with your environment variables for things like JDK_HOME being on different drives on Windows.
+# TODO
 
-Try moving the project to the C drive.
+- add helpful compiler options
 
 
 
@@ -16,5 +12,17 @@ Try moving the project to the C drive.
 - scalajs
 - zio http
 - tapir
+- sttp
+- airstream
 - laminar
 
+
+# Troubleshooting
+
+If you get something like 
+```
+java.io.IOException: GetOverlappedResult() failed for read operation: 233
+```
+it may have to do with your environment variables for things like JDK_HOME being on different drives on Windows.
+
+Try moving the project to the C drive.
