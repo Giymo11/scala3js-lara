@@ -2,11 +2,17 @@ import $ivy.`com.lihaoyi::mill-contrib-docker:$MILL_VERSION`
 import $ivy.`com.lihaoyi::mill-contrib-bloop:$MILL_VERSION`
 
 import mill._
+import mill.api.PathRef
+import mill.define.Task
 import mill.scalajslib._
-import scalalib._
-import scalafmt._
+import mill.scalalib._
+import mill.scalalib.scalafmt._
 
 import contrib.docker.DockerModule
+
+import ammonite.ops._
+import $file.webpack
+import webpack.ScalaJSWebpackModule
 
 object lara extends Module {
   object Versions {
@@ -20,6 +26,8 @@ object lara extends Module {
     val sttpClient3 = "3.3.13"
     val laminar = "0.13.1"
     val airstream = "0.13.0"
+
+    val uuid = "8.3.2"
 
     // has to be this way because sjsdom is not published for scala 3
     val sjsWorkaround = "_sjs1_2.13"
@@ -43,6 +51,10 @@ object lara extends Module {
       ivy"io.github.cquiroz::scala-java-time::2.3.0",
       ivy"com.raquo::laminar::$laminar"
     )
+
+    val npmDeps = Agg(
+      "uuid" -> uuid
+    )
   }
 
   trait Common extends ScalaModule {
@@ -57,36 +69,44 @@ object lara extends Module {
 
     def scalacOptions = Seq(
       "-deprecation", // Emit warning and location for usages of deprecated APIs.
-      "-encoding", "utf-8",   // Specify character encoding used by source files.
+      "-encoding",
+      "utf-8", // Specify character encoding used by source files.
       "-explain-types", // Explain type errors in more detail.
-      "-unchecked",  // Enable additional warnings where generated code depends on assumptions.
+      "-unchecked", // Enable additional warnings where generated code depends on assumptions.
       "-feature", // Emit warning and location for usages of features that should be imported explicitly.
-      "-language:implicitConversions",  // Allow definition of implicit functions called views
+      "-language:implicitConversions", // Allow definition of implicit functions called views
       // "-Ykind-projector",
-      
-      "-rewrite", "-new-syntax",  // use new syntax for control structures
-      "-source", "future", // restricts to scala 3.1 featureset
-
+      "-rewrite",
+      "-new-syntax", // use new syntax for control structures
+      "-source",
+      "future", // restricts to scala 3.1 featureset
       "-Xfatal-warnings", // Fail the compilation if there are any warnings.
-      "-Yexplicit-nulls", // experimental, forces you to think about every null
+      "-Yexplicit-nulls" // experimental, forces you to think about every null
     )
   }
 
   object shared extends Common
 
-  object frontend extends Common with ScalaJSModule with ScalafmtModule {
+  object frontend extends ScalaJSWebpackModule with Common with ScalafmtModule {
     override def scalaJSVersion = Versions.scalajs
 
     def ivyDeps = super.ivyDeps() ++ Versions.jsDeps
 
     def mainClass = Some("science.wasabi.lara.frontend.Main")
+
+    // fastopt or fullopt
+    override def optimizeJs = false
+
+    override def npmDeps = super.npmDeps() ++ Versions.npmDeps
   }
 
   object backend extends Common with ScalafmtModule with DockerModule {
     def ivyDeps = super.ivyDeps() ++ Versions.jvmDeps
 
+    def jsBundle: Task[PathRef] = frontend.webpackBundle
+
     def resources = T.sources {
-      super.resources() :+ PathRef(frontend.fastOpt().path / os.up)
+      super.resources() :+ jsBundle()
     }
 
     object docker extends DockerConfig {

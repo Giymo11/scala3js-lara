@@ -1,4 +1,7 @@
 .idea
 .bloop
 .metals
+.ammonite
+.coursier
+.vscode
 out

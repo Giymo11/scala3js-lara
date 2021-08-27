@@ -16,7 +16,7 @@ object Routes {
     case Method.GET -> Root                => ZhttpHelper.respondWithHtml(StaticFiles.indexHtml)
     case Method.GET -> Root / "index.html" => ZhttpHelper.permanentRedirectTo("/")
     case Method.GET -> Root / "out.js"  => ZhttpHelper.respondWithJs(StaticFiles.bundleJs)
-    case Method.GET -> Root / "out.js.map"  => ZhttpHelper.respondWithJs(StaticFiles.bundleJsMap)
+    // case Method.GET -> Root / "out.js.map"  => ZhttpHelper.respondWithJs(StaticFiles.bundleJsMap)
   }
 
   val notFound = Http.collect[Request] {
