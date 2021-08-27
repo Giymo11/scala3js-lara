@@ -1,7 +1,6 @@
 
 # TODO
 
-- add helpful compiler options
 
 
 
@@ -10,11 +9,16 @@
 - mill
 - scala 3
 - scalajs
+- npm
+- webpack
+
 - zio http
 - tapir
 - sttp
 - airstream
 - laminar
+
+- crypto-js
 
 
 # Troubleshooting

@@ -60,14 +60,14 @@ object lara extends Module {
   trait Common extends ScalaModule {
     override def scalaVersion = Versions.scala
 
-    def ivyDeps = super.ivyDeps() ++ Versions.sharedDeps
+    override def ivyDeps = super.ivyDeps() ++ Versions.sharedDeps
 
-    def sources = T.sources(
+    override def sources = T.sources(
       millSourcePath / "src",
       millSourcePath / os.up / "shared" / "src"
     )
 
-    def scalacOptions = Seq(
+    override def scalacOptions = Seq(
       "-deprecation", // Emit warning and location for usages of deprecated APIs.
       "-encoding",
       "utf-8", // Specify character encoding used by source files.
@@ -87,32 +87,29 @@ object lara extends Module {
 
   object shared extends Common
 
-  object frontend extends ScalaJSWebpackModule with Common with ScalafmtModule {
+  object frontend extends Common with ScalaJSWebpackModule with ScalafmtModule {
     override def scalaJSVersion = Versions.scalajs
 
-    def ivyDeps = super.ivyDeps() ++ Versions.jsDeps
+    override def ivyDeps = super.ivyDeps() ++ Versions.jsDeps
+    override def npmDeps = super.npmDeps() ++ Versions.npmDeps
 
-    def mainClass = Some("science.wasabi.lara.frontend.Main")
+    override def mainClass = Some("science.wasabi.lara.frontend.Main")
 
     // fastopt or fullopt
     override def optimizeJs = false
-
-    override def npmDeps = super.npmDeps() ++ Versions.npmDeps
   }
 
   object backend extends Common with ScalafmtModule with DockerModule {
-    def ivyDeps = super.ivyDeps() ++ Versions.jvmDeps
+    override def ivyDeps = super.ivyDeps() ++ Versions.jvmDeps
 
-    def jsBundle: Task[PathRef] = frontend.webpackBundle
-
-    def resources = T.sources {
-      super.resources() :+ jsBundle()
+    override def resources = T.sources {
+      super.resources() :+ frontend.webpackBundle()
     }
 
     object docker extends DockerConfig {
-      def tags = List("giymo11/lara-backend")
+      override def tags = List("giymo11/lara-backend")
     }
 
-    def mainClass = Some("science.wasabi.lara.backend.Main")
+    override def mainClass = Some("science.wasabi.lara.backend.Main")
   }
 }

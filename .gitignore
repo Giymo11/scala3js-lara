@@ -4,4 +4,10 @@
 .ammonite
 .coursier
 .vscode
+.bsp
 out
+*metals.sbt
+yarn.lock
+.yarn*
+target
+
