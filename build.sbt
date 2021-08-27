@@ -14,7 +14,7 @@ val airstream = "0.13.0"
 val scalaJsDom = "1.1.0"
 val scalaJavaTime = "2.3.0"
 
-val uuid = "8.3.2"
+val uuid = "8.3.1"
 
 val compilerOptions = Seq(
   "-deprecation", // Emit warning and location for usages of deprecated APIs.
@@ -75,10 +75,9 @@ lazy val frontend = project
   .settings(
     libraryDependencies ++= Seq(
       ("org.scala-js" %%% "scalajs-dom" % scalaJsDom).cross(CrossVersion.for3Use2_13),
-      ("com.softwaremill.sttp.tapir" %%% "tapir-sttp-client" % tapir)
-        .cross(CrossVersion.for3Use2_13),
-      "com.softwaremill.sttp.client3" %%% "core" % sttpClient3,
-      "io.github.cquiroz" %%% "scala-java-time" % scalaJavaTime,
+      ("com.softwaremill.sttp.tapir" %%% "tapir-sttp-client" % tapir).cross(CrossVersion.for3Use2_13),
+      ("com.softwaremill.sttp.client3" %%% "core" % sttpClient3).cross(CrossVersion.for3Use2_13),
+      ("io.github.cquiroz" %%% "scala-java-time" % scalaJavaTime).cross(CrossVersion.for3Use2_13),
       "com.raquo" %%% "laminar" % laminar
     ),
     useYarn := true,
