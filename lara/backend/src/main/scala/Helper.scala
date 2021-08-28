@@ -5,7 +5,7 @@ object StaticFiles {
 
   val indexHtml = os.read(os.resource / "index.html")
   // this is inserted by the build tool from the "frontend" module
-  val bundleJs = os.read(os.resource / "out-bundle.js")
+  val bundleJs = os.read(os.resource / "public" / "frontend-fastopt-bundle.js")
   // val bundleJsMap = os.read(os.resource / "out.js.map")
 }
 
