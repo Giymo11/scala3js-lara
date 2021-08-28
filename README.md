@@ -1,8 +1,7 @@
 
 # TODO
 
-- add helpful compiler options
-
+- automatically generate the facade libraries
 
 
 # tech used
@@ -10,11 +9,19 @@
 - mill
 - scala 3
 - scalajs
+- scalably-typed
+
 - zio http
 - tapir
 - sttp
 - airstream
 - laminar
+
+- uuid
+
+# Building & Running
+
+After adding an npm-dependency, execute `mill lara.frontend.compile` and `stc -d ./out/lara/frontend/webpackOutputPath/dest <lib>` to generate the local facade library. 
 
 
 # Troubleshooting

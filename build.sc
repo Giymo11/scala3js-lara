@@ -27,7 +27,7 @@ object lara extends Module {
     val laminar = "0.13.1"
     val airstream = "0.13.0"
 
-    val uuid = "8.3.2"
+    val uuid = "8.3.1"
 
     // has to be this way because sjsdom is not published for scala 3
     val sjsWorkaround = "_sjs1_2.13"
@@ -53,7 +53,8 @@ object lara extends Module {
     )
 
     val npmDeps = Agg(
-      "uuid" -> uuid
+      "uuid" -> uuid,
+      "@types/uuid" -> uuid
     )
   }
 
@@ -90,7 +91,8 @@ object lara extends Module {
   object frontend extends ScalaJSWebpackModule with Common with ScalafmtModule {
     override def scalaJSVersion = Versions.scalajs
 
-    def ivyDeps = super.ivyDeps() ++ Versions.jsDeps
+    val scalablyTypedConversions = Seq(ivy"org.scalablytyped::uuid::8.3.1-41787e")
+    def ivyDeps = super.ivyDeps() ++ Versions.jsDeps ++ scalablyTypedConversions
 
     def mainClass = Some("science.wasabi.lara.frontend.Main")
 
@@ -98,6 +100,7 @@ object lara extends Module {
     override def optimizeJs = false
 
     override def npmDeps = super.npmDeps() ++ Versions.npmDeps
+    override def npmDevDeps = super.npmDevDeps() ++ Seq("typescript" -> "4.4.2")
   }
 
   object backend extends Common with ScalafmtModule with DockerModule {
