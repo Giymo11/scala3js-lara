@@ -42,8 +42,9 @@ ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "cats-effect
 
 lazy val shared = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure) // this will cross compile
-  .in(file("shared"))
+  .in(file("lara/shared"))
   .settings(
+    Compile / scalaSource := baseDirectory.value / "src",
     libraryDependencies ++= Seq(
       "com.softwaremill.sttp.tapir" %% "tapir-core" % tapir,
       "dev.zio" %%% "zio" % zio
@@ -55,9 +56,10 @@ lazy val sharedJS = shared.js
 lazy val sharedJVM = shared.jvm
 
 lazy val backend = project
-  .in(file("backend"))
+  .in(file("lara/backend"))
   .dependsOn(sharedJVM)
   .settings(
+    Compile / scalaSource := baseDirectory.value / "src",
     libraryDependencies ++= Seq(
       "io.d11" %% "zhttp" % zhttp,
       "com.lihaoyi" %% "os-lib" % osLib,
@@ -70,9 +72,10 @@ lazy val backend = project
   .enablePlugins(WebScalaJSBundlerPlugin)
 
 lazy val frontend = project
-  .in(file("frontend"))
+  .in(file("lara/frontend"))
   .dependsOn(sharedJS)
   .settings(
+    Compile / scalaSource := baseDirectory.value / "src",
     libraryDependencies ++= Seq(
       ("org.scala-js" %%% "scalajs-dom" % scalaJsDom).cross(CrossVersion.for3Use2_13),
       ("com.softwaremill.sttp.tapir" %%% "tapir-sttp-client" % tapir).cross(CrossVersion.for3Use2_13),
