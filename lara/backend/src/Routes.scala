@@ -12,10 +12,10 @@ object Routes {
   val helloWorld = ZioHttpInterpreter().toHttp(Endpoints.helloWorldEndpoint)(helloWorldLogic)
 
   val staticRoutes = Http.collect[Request] {
-    case Method.GET -> Root / "hello"      => Response.text("Hello World!")
-    case Method.GET -> Root                => ZhttpHelper.respondWithHtml(StaticFiles.indexHtml)
-    case Method.GET -> Root / "index.html" => ZhttpHelper.permanentRedirectTo("/")
-    case Method.GET -> Root / "out.js"  => ZhttpHelper.respondWithJs(StaticFiles.bundleJs)
+    case Method.GET -> Root / "hello"       => Response.text("Hello World!")
+    case Method.GET -> Root                 => ZhttpHelper.respondWithHtml(StaticFiles.indexHtml)
+    case Method.GET -> Root / "index.html"  => ZhttpHelper.permanentRedirectTo("/")
+    case Method.GET -> Root / "out.js"      => ZhttpHelper.respondWithJs(StaticFiles.bundleJs)
     // case Method.GET -> Root / "out.js.map"  => ZhttpHelper.respondWithJs(StaticFiles.bundleJsMap)
   }
 

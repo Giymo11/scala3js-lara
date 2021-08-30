@@ -8,11 +8,14 @@ import mill.scalajslib._
 import mill.scalalib._
 import mill.scalalib.scalafmt._
 
+import ammonite.ops._
+
 import contrib.docker.DockerModule
 
-import ammonite.ops._
 import $file.webpack
 import webpack.ScalaJSWebpackModule
+import $file.oshelper
+import oshelper.OsHelper
 
 object lara extends Module {
   object Versions {
@@ -88,10 +91,12 @@ object lara extends Module {
 
   object shared extends Common
 
-  object frontend extends ScalaJSWebpackModule with Common with ScalafmtModule {
+  object frontend extends Common with ScalaJSWebpackModule with ScalafmtModule {
     override def scalaJSVersion = Versions.scalajs
 
-    val scalablyTypedConversions = Seq(ivy"org.scalablytyped::uuid::8.3.1-41787e")
+    val scalablyTypedConversions =
+      if (OsHelper.isWindows()) Seq(ivy"org.scalablytyped::uuid::8.3.1-6d1742")
+      else Seq(ivy"org.scalablytyped::uuid::8.3.1-41787e")
     def ivyDeps = super.ivyDeps() ++ Versions.jsDeps ++ scalablyTypedConversions
 
     def mainClass = Some("science.wasabi.lara.frontend.Main")

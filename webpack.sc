@@ -1,3 +1,4 @@
+import scala.sys.SystemProperties
 // COPIED FROM github.com/pstutz/scala-fullstack - thanks a lot!
 
 import java.io._
@@ -11,6 +12,9 @@ import mill.scalajslib._
 import mill.scalajslib.api.ModuleKind
 import mill.util.Ctx
 import os.SubProcess
+
+import $file.oshelper
+import oshelper.OsHelper
 
 /**
  * Trait for Scala.js modules that create a webpack bundle from their NPM dependencies.
@@ -57,13 +61,13 @@ trait ScalaJSWebpackModule extends ScalaJSModule {
   // Direct npm development dependencies
   def npmDevDeps: T[Agg[(String, String)]] = Agg.empty[(String, String)]
 
-  def webpackVersion: Target[String] = "4.43.0"
+  def webpackVersion: Target[String] = "5.51.1"
 
-  def webpackMergeVersion: Target[String] = "4.2.2"
+  def webpackMergeVersion: Target[String] = "5.8.0"
 
-  def webpackCliVersion: Target[String] = "3.3.11"
+  def webpackCliVersion: Target[String] = "4.8.0"
 
-  def sourceMapLoaderVersion: Target[String] = "1.0.0"
+  def sourceMapLoaderVersion: Target[String] = "3.0.0"
 
   def scalaJsFriendlySourceMapLoaderVersion: Target[String] = "0.1.5"
 
@@ -123,7 +127,9 @@ trait ScalaJSWebpackModule extends ScalaJSModule {
 
   def installNpmDependencies: Task[PathRef] = T {
     writeWebpackPackageSpec()
-    print(ops.%%("npm", "install", "--no-fund")(webpackOutputPath()).out.string)
+    val cmd = if(OsHelper.isWindows()) "npm.cmd" else "npm"
+
+    print(ops.%%(cmd, "install", "--no-fund")(webpackOutputPath()).out.string)
     PathRef(webpackOutputPath())
   }
 
@@ -166,10 +172,10 @@ trait ScalaJSWebpackModule extends ScalaJSModule {
           |const $generatedCfgName = {
           |  "mode": "${if (optimizeJs) "production" else "development"}",
           |  "devtool": "${if (optimizeJs) "eval" else "eval-cheap-module-source-map"}",
-          |  "entry": "$entry",
+          |  "entry": "${OsHelper.convertBackslash(entry)}",
           |  "output": {
-          |    "path": "${webpackOutputPath()}",
-          |    "filename": "${webpackBundleFilename()}"
+          |    "path": "${OsHelper.convertBackslash(webpackOutputPath())}",
+          |    "filename": "${OsHelper.convertBackslash(webpackBundleFilename())}"
           |  },
           |  "watch": true,
           |  "module": {
