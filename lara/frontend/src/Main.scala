@@ -9,6 +9,7 @@ import com.raquo.laminar.api.L.{given, *}
 import science.wasabi.lara.*
 
 import typings.uuid.{mod as Uuid}
+import com.raquo.airstream.state.Var
 
 object Main extends App {
   println("Hello world!")
@@ -19,20 +20,24 @@ object Main extends App {
 
   val containerNode = dom.document.querySelector("#laminarContainer")
 
-  val nameVar = Var(initial = "world")
+  val apiKey: Var[String] = Var(initial = "")
+  val apiSecret = Var(initial = "")
 
-  val rootElement = div(
-    label("Your name: "),
+
+  def inputComponent(desc: String, variable: Var[String]) = div(
+    label(s"$desc: "),
     input(
-      onMountFocus,
-      placeholder := "Enter your name here",
-      inContext { thisNode => onInput.map(_ => thisNode.ref.value) --> nameVar }
-    ),
-    span(
-      "Hello, ",
-      child.text <-- nameVar.signal.map(_.toUpperCase.nn)
+      placeholder := s"Enter your $desc here",
+      inContext { thisNode => onInput.map(_ => thisNode.ref.value) --> variable }
     )
   )
 
-  render(containerNode, rootElement)
+  val app = div(
+    inputComponent("Kraken Public Key", apiKey),
+    inputComponent("Kraken Secret Key", apiSecret)
+  )
+
+
+
+  render(containerNode, app)
 }

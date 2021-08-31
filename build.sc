@@ -94,6 +94,9 @@ object lara extends Module {
   object frontend extends Common with ScalaJSWebpackModule with ScalafmtModule {
     override def scalaJSVersion = Versions.scalajs
 
+    override def npmDeps = super.npmDeps() ++ Versions.npmDeps
+    override def npmDevDeps = super.npmDevDeps() ++ Seq("typescript" -> "4.4.2")
+
     val scalablyTypedConversions =
       if (OsHelper.isWindows()) Seq(ivy"org.scalablytyped::uuid::8.3.1-6d1742")
       else Seq(ivy"org.scalablytyped::uuid::8.3.1-41787e")
@@ -104,8 +107,9 @@ object lara extends Module {
     // fastopt or fullopt
     override def optimizeJs = false
 
-    override def npmDeps = super.npmDeps() ++ Versions.npmDeps
-    override def npmDevDeps = super.npmDevDeps() ++ Seq("typescript" -> "4.4.2")
+    object test extends Tests with TestModule.Utest {
+      def ivyDeps = Agg(ivy"com.lihaoyi::utest::0.7.10")
+    }
   }
 
   object backend extends Common with ScalafmtModule with DockerModule {
