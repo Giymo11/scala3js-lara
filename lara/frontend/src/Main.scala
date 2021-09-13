@@ -10,6 +10,7 @@ import science.wasabi.lara.*
 
 import typings.uuid.{mod as Uuid}
 import com.raquo.airstream.state.Var
+import scala.scalajs.js.URIUtils
 
 object Main extends App {
   println("Hello world!")
@@ -22,7 +23,6 @@ object Main extends App {
 
   val apiKey: Var[String] = Var(initial = "")
   val apiSecret = Var(initial = "")
-
 
   def inputComponent(desc: String, variable: Var[String]) = div(
     label(s"$desc: "),
@@ -37,7 +37,27 @@ object Main extends App {
     inputComponent("Kraken Secret Key", apiSecret)
   )
 
-
-
   render(containerNode, app)
+
+
+  val userAgent = "Lara/0.1"
+  val contentType = "application/x-www-form-urlencoded"
+
+  import sttp.client3.*
+
+  var base = uri"https://api.kraken.com/"
+  val nonce = "1616492376594"
+  val path = "/0/private/AddOrder"
+  val encodedPrivateKey = "kQH5HW/8p1uGOVjbgWA7FunAmGO8lsSUXNsu3eow76sz84Q18fWxnyRzBHCd3pd5nE9qa99HAZtuZuj6F1huXg=="
+  var request = Seq(
+    "ordertype" -> "limit",
+    "pair" -> "XBTUSD",
+    "price" -> "37500",
+    "type" -> "buy",
+    "volume" -> "1.25"
+  )
+
+  val signature = Kraken.getMessageSignature(path, request, encodedPrivateKey, nonce)
+
+  println(signature)
 }

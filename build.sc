@@ -19,7 +19,7 @@ import oshelper.OsHelper
 
 object lara extends Module {
   object Versions {
-    val scala = "3.0.1"
+    val scala = "3.0.2"
     val scalajs = "1.7.0"
 
     val zio = "1.0.11"
@@ -31,6 +31,7 @@ object lara extends Module {
     val airstream = "0.13.0"
 
     val uuid = "8.3.1"
+    val qs = "6.9.7"
 
     // has to be this way because sjsdom is not published for scala 3
     val sjsWorkaround = "_sjs1_2.13"
@@ -57,7 +58,17 @@ object lara extends Module {
 
     val npmDeps = Agg(
       "uuid" -> uuid,
-      "@types/uuid" -> uuid
+      "@types/uuid" -> uuid,
+      "crypto-js" -> "4.1.1",
+      "@types/crypto-js" -> "4.0.2"
+
+     /* "qs" -> qs,
+      "@types/qs" -> qs,*/
+    )
+
+    val tsDeps = Agg(
+      ivy"org.scalablytyped::uuid::8.3.1-6d1742",
+      ivy"org.scalablytyped::crypto-js::4.0.2-a3967d",
     )
   }
 
@@ -98,7 +109,7 @@ object lara extends Module {
     override def npmDevDeps = super.npmDevDeps() ++ Seq("typescript" -> "4.4.2")
 
     val scalablyTypedConversions =
-      if (OsHelper.isWindows()) Seq(ivy"org.scalablytyped::uuid::8.3.1-6d1742")
+      if (OsHelper.isWindows()) Versions.tsDeps
       else Seq(ivy"org.scalablytyped::uuid::8.3.1-41787e")
     def ivyDeps = super.ivyDeps() ++ Versions.jsDeps ++ scalablyTypedConversions
 
@@ -107,8 +118,9 @@ object lara extends Module {
     // fastopt or fullopt
     override def optimizeJs = false
 
-    object test extends Tests with TestModule.Utest {
+    object test extends Common with frontend with Tests with TestModule.Utest {
       def ivyDeps = Agg(ivy"com.lihaoyi::utest::0.7.10")
+      override def optimizeJs = false
     }
   }
 
